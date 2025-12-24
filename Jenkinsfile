@@ -23,7 +23,7 @@ pipeline {
 
         stage('Build Frontend (React)') {
             steps {
-                dir('frontend') {
+                dir('sonartestapp.client') {
                     sh '''
                       npm install --legacy-peer-deps
                       npm run build
