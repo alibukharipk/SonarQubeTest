@@ -1,13 +1,51 @@
 <!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<html>
+ <!-- ❌ Missing lang attribute (Accessibility issue) -->
+<head>
+    <meta charset="UTF-8">
     <title>sonartestapp.client</title>
-  </head>
-  <body>
+
+    <!-- ❌ Inline style (Code Smell) -->
+    <style>
+        body {
+            background-color: red;
+        }
+    </style>
+
+    <!-- ❌ Deprecated tag -->
+    <font color="blue">Deprecated font tag</font>
+</head>
+
+<body onclick="alert('clicked')">
+    <!-- ❌ Inline JS event handler -->
+    <!-- ❌ Duplicate IDs -->
     <div id="root"></div>
-    <script type="module" src="/src/main.jsx"></script>
-  </body>
+    <div id="root"></div>
+
+    <!-- ❌ Empty heading (Accessibility issue) -->
+    <h1></h1>
+
+    <!-- ❌ Image without alt attribute -->
+    <img src="logo.png">
+
+    <!-- ❌ Inline script + eval (Security hotspot) -->
+    <script>
+        var x = "console.log('Hello')";
+        eval(x);
+    </script>
+
+    <!-- ❌ Unused variable -->
+    <script>
+        var unusedVariable = 123;
+    </script>
+
+    <!-- ❌ Script at bottom without type/module consistency -->
+    <script src="/src/main.jsx"></script>
+
+    <!-- ❌ Improper nesting -->
+    <p><div>Invalid nesting</div></p>
+
+    <span>Hello world</span>
+
+</body>
 </html>
