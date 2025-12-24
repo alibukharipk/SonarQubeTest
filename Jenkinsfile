@@ -3,6 +3,7 @@ pipeline {
 
     tools {
         nodejs 'NodeJS-18'
+        dotnetsdk 'dotnet-sdk-8'
     }
 
     environment {
