@@ -19,16 +19,7 @@ pipeline {
             }
         }
 
-        stage('Build Backend (.NET 8)') {
-            steps {
-                dir('backend') {
-                    sh '''
-                      dotnet restore
-                      dotnet build --no-restore
-                    '''
-                }
-            }
-        }
+
 
         stage('Build Frontend (React)') {
             steps {
