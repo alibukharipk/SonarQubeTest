@@ -1,0 +1,6 @@
+@SonarTestApp.Server_HostAddress = http://localhost:5298
+
+GET {{SonarTestApp.Server_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
