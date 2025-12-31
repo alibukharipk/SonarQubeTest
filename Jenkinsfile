@@ -87,7 +87,7 @@ pipeline {
                     --scan .
                     --format ALL
                     --failOnCVSS 7
-                    --project "ReactJS-SonarTest"
+                    --project "SonarTestApp (React + .NET)"
                 ''',
                 odcInstallation: 'dependency-check'
             }
