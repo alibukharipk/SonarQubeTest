@@ -8,23 +8,20 @@ pipeline {
 
     environment {
         DOTNET_CLI_TELEMETRY_OPTOUT = '1'
-        SONAR_SCANNER = tool 'SonarScanner'
+        DOTNET_NOLOGO = '1'
     }
 
     stages {
 
-        stage('Checkout') {
-            steps {
-                checkout scm
-            }
-        }
-
-
-
-        stage('Build Frontend (React)') {
+        /* =======================
+           REACTJS BUILD
+        ======================= */
+        stage('ReactJS - Install & Build') {
             steps {
                 dir('sonartestapp.client') {
                     sh '''
+                      node -v
+                      npm -v
                       npm install --legacy-peer-deps
                       npm run build
                     '''
@@ -32,33 +29,83 @@ pipeline {
             }
         }
 
-        stage('SonarQube Analysis') {
+        /* =======================
+           .NET 8 BUILD + SECURITYCODESCAN
+        ======================= */
+        stage('.NET 8 - Restore & Build') {
             steps {
-                withSonarQubeEnv('SonarQube') {
-                    sh """
-                      dotnet ${SONAR_SCANNER}/SonarScanner.MSBuild.dll begin \
-                        /k:"github-dotnet-react" \
-                        /n:"GitHub .NET + React" \
-                        /d:sonar.host.url=$SONAR_HOST_URL \
-                        /d:sonar.login=$SONAR_AUTH_TOKEN \
-                        /d:sonar.sources=SonarTestApp.Server,sonartestapp.client \
-                        /d:sonar.exclusions=**/node_modules/**,**/build/**
-
-                      dotnet build backend
-
-                      dotnet ${SONAR_SCANNER}/SonarScanner.MSBuild.dll end \
-                        /d:sonar.login=$SONAR_AUTH_TOKEN
-                    """
+                dir('SonarTestApp.Server') {
+                    sh '''
+                      dotnet restore
+                      dotnet build \
+                        --configuration Release \
+                        /warnaserror \
+                        /p:RunAnalyzers=true \
+                        /p:EnableNETAnalyzers=true \
+                        /p:AnalysisLevel=latest
+                    '''
                 }
             }
         }
 
-        stage('Quality Gate') {
+        /* =======================
+           SONARQUBE ANALYSIS
+        ======================= */
+        stage('SonarQube Analysis') {
+            steps {
+                script {
+                    def scannerHome = tool 'SonarScanner'
+                    withSonarQubeEnv('SonarQube') {
+                        sh """
+                        ${scannerHome}/bin/sonar-scanner \
+                          -Dsonar.projectKey=SonarTestApp \
+                          -Dsonar.projectName=SonarTestApp \
+                          -Dsonar.sources=sonartestapp.client/src,SonarTestApp.Server \
+                          -Dsonar.javascript.lcov.reportPaths=sonartestapp.client/coverage/lcov.info
+                        """
+                    }
+                }
+            }
+        }
+
+        /* =======================
+           SONARQUBE QUALITY GATE
+        ======================= */
+        stage('SonarQube Quality Gate') {
             steps {
                 timeout(time: 5, unit: 'MINUTES') {
                     waitForQualityGate abortPipeline: true
                 }
             }
+        }
+
+        /* =======================
+           OWASP DEPENDENCY-CHECK
+        ======================= */
+        stage('OWASP Dependency-Check') {
+            steps {
+                dependencyCheck additionalArguments: '''
+                    --scan .
+                    --format ALL
+                    --failOnCVSS 7
+                    --project "SonarTestApp"
+                ''',
+                odcInstallation: 'dependency-check'
+            }
+        }
+    }
+
+    post {
+        always {
+            dependencyCheckPublisher pattern: '**/dependency-check-report.xml'
+        }
+
+        success {
+            echo '✅ Build PASSED – No critical security issues found'
+        }
+
+        failure {
+            echo '❌ Build FAILED – Critical security issues detected'
         }
     }
 }
