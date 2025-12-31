@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     tools {
-        nodejs 'NodeJS-18'
+        nodejs 'NodeJS-22'
         dotnetsdk 'dotnet-sdk-8'
     }
 
