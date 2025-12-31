@@ -57,8 +57,8 @@ pipeline {
                     withSonarQubeEnv('SonarQube') {
                         sh """
                         ${scannerHome}/bin/sonar-scanner \
-                          -Dsonar.projectKey=SonarTestApp \
-                          -Dsonar.projectName=SonarTestApp \
+                          -Dsonar.projectKey=ReactJS-SonarTest \
+                          -Dsonar.projectName=ReactJS-SonarTest \
                           -Dsonar.sources=sonartestapp.client/src,SonarTestApp.Server \
                           -Dsonar.javascript.lcov.reportPaths=sonartestapp.client/coverage/lcov.info
                         """
@@ -87,7 +87,7 @@ pipeline {
                     --scan .
                     --format ALL
                     --failOnCVSS 7
-                    --project "SonarTestApp"
+                    --project "ReactJS-SonarTest"
                 ''',
                 odcInstallation: 'dependency-check'
             }
