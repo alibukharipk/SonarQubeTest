@@ -1,14 +1,8 @@
 pipeline {
-
-  agent {
-        docker {
-            image 'mcr.microsoft.com/dotnet/sdk:8.0'
-            args '-u root'
-        }
-    }
+    agent any
 
     tools {
-        nodejs 'NodeJS-20'
+        nodejs 'NodeJS-22'
     }
 
     environment {
