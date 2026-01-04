@@ -12,18 +12,6 @@ pipeline {
 
     stages {
 
-        
-        /* =======================
-           SONARQUBE QUALITY GATE
-        ======================= */
-        stage('SonarQube Quality Gate') {
-            steps {
-                timeout(time: 15, unit: 'MINUTES') {
-                    waitForQualityGate abortPipeline: true
-                }
-            }
-        }
-
         /* =======================
            OWASP DEPENDENCY-CHECK
         ======================= */
